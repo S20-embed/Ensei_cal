@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>競争遠征計算機_260316_1500</title>
+<title>競争遠征計算機</title>
 
 <style>
 body{
@@ -42,11 +42,16 @@ margin-top:0;
 
 <body>
 
-<h2>🚀 競争遠征の速度計算機</h2>
+<h2><center>🍒 競争遠征の速度計算ツール🍒</center></h2>
+
 
 <div class="box">
-<h3>速度計算</h3>
 
+<h3>⚡ 速度計算⚡ </h3>
+<p>派遣予定の戦力合計と物資を入力して、速度を計算します<br>
+戦力合算が面倒な場合は、一番下の合算計算機を利用してくださいね。</p>
+
+<hr>
 派遣戦力 (例: 242.4M / 16.6B / 1.2T)<br>
 <input id="power"><br>
 
@@ -56,108 +61,160 @@ margin-top:0;
 <button onclick="calc()">速度計算</button>
 
 <h3 id="result"></h3>
+
 </div>
 
-<div class="box">
-<h3>⚡ 最大速度(2191km/s)に必要な物資</h3>
 
+<div class="box">
+
+<h3>⚡ 最大速度に必要な物資計算⚡ </h3>
+<p>最大速度(2191km/s)を出すために必要な物資を計算します<br>
+戦力合算が面倒な場合は(ry</p>
+<hr>
 派遣戦力 (例: 242.4M / 16.6B / 1.2T)<br>
 <input id="power2"><br><br>
 
 <button onclick="maxcalc()">必要物資を計算</button>
 
 <h3 id="maxresult"></h3>
+
 </div>
+
+
+<div class="box">
+
+<h3>👥 上位4人戦力の合計計算👥 </h3>
+<p>遠征に出す予定の戦友戦力合計を計算してみましょう<br>
+下に戦力を入れて合計計算ボタンをクリックしたら、上に自動的に合計値が入力されます<br>
+単位を入力しなかった場合の基本単位はMで、B/T単位も計算できます<br>
+派遣しない枠がある場合は、０を入力してくださいね</p>
+<p>例）０、100、100M、5B、0.1T</p>
+<hr>
+1人目<br>
+<input id="p1"><br>
+
+2人目<br>
+<input id="p2"><br>
+
+3人目<br>
+<input id="p3"><br>
+
+4人目<br>
+<input id="p4"><br><br>
+
+<button onclick="sumPower()">合計計算</button>
+
+<h3 id="sumresult"></h3>
+
+</div>
+<p align=right>2026/3/16修正・何かありましたら、ゲストにお知らせくださいね♪</p>
 
 <script>
 
 // 단위 변환
 function parsePower(input){
 
-    input=input.trim().toLowerCase();
+input=input.trim().toLowerCase();
 
-    let num=parseFloat(input);
+let num=parseFloat(input);
 
-    if(input.includes("t")) return num*1000000;
-    if(input.includes("b")) return num*1000;
-    if(input.includes("m")) return num;
+if(input.includes("t")) return num*1000000;
+if(input.includes("b")) return num*1000;
+if(input.includes("m")) return num;
 
-    return num;
+return num;
 }
 
 
 // 속도 계산
 function calc(){
 
-    let power=parsePower(document.getElementById("power").value);
-    let supply=parseFloat(document.getElementById("supply").value);
+let power=parsePower(document.getElementById("power").value);
+let supply=parseFloat(document.getElementById("supply").value);
 
-    if(isNaN(power) || isNaN(supply)){
-        document.getElementById("result").innerHTML="値を正しく入力してください。";
-        return;
-    }
+if(isNaN(power) || isNaN(supply)){
+document.getElementById("result").innerHTML="値を正しく入力してください。";
+return;
+}
 
-    // 물자가산
-    let bonus=100000000*(1-Math.exp(-supply/21));
+let bonus=100000000*(1-Math.exp(-supply/21));
 
-    // 환산전력 (M)
-    let converted=power*(1+bonus/100);
+let converted=power*(1+bonus/100);
 
-    // 속도 계산
-    let speed=100*Math.log(converted)+120;
+let speed=100*Math.log(converted)+120;
 
-    if(speed>2191){speed=2191;}
+if(speed>2191){speed=2191;}
 
-    document.getElementById("result").innerHTML=
-    "物資加算: "+bonus.toFixed(0)+" %<br>"+
-    "換算戦力: "+converted.toLocaleString()+" M<br>"+
-    "速度: "+speed.toFixed(0)+" km/s";
+document.getElementById("result").innerHTML=
+"物資加算: "+bonus.toFixed(0)+" %<br>"+
+"換算戦力: "+converted.toLocaleString()+" M<br>"+
+"速度: "+speed.toFixed(0)+" km/s";
 }
 
 
-// 최대속도 필요 물자 계산
+// 최대속도 계산
 function maxcalc(){
 
-    let power=parsePower(document.getElementById("power2").value);
+let power=parsePower(document.getElementById("power2").value);
 
-    if(isNaN(power)){
-        document.getElementById("maxresult").innerHTML="値を正しく入力してください。";
-        return;
-    }
+if(isNaN(power)){
+document.getElementById("maxresult").innerHTML="値を正しく入力してください。";
+return;
+}
 
-    // 100aa 넣었을 때 속도 확인
-    let bonusMax = 100000000*(1-Math.exp(-100/21));
-    let convertedMax = power*(1+bonusMax/100);
-    let speedMax = 100*Math.log(convertedMax)+120;
+let bonusMax = 100000000*(1-Math.exp(-100/21));
+let convertedMax = power*(1+bonusMax/100);
+let speedMax = 100*Math.log(convertedMax)+120;
 
-    if(speedMax < 2191){
-        document.getElementById("maxresult").innerHTML =
-        "⚠ この戦力では最大速度に到達できません (100aaでも不足)";
-        return;
-    }
+if(speedMax < 2191){
+document.getElementById("maxresult").innerHTML=
+"⚠ この戦力では最大速度に到達できません (100aaでも不足)";
+return;
+}
 
-    let low=0;
-    let high=100;
-    let supply=0;
+let low=0;
+let high=100;
+let supply=0;
 
-    for(let i=0;i<100;i++){
+for(let i=0;i<100;i++){
 
-        supply=(low+high)/2;
+supply=(low+high)/2;
 
-        let bonus=100000000*(1-Math.exp(-supply/21));
-        let converted=power*(1+bonus/100);
-        let speed=100*Math.log(converted)+120;
+let bonus=100000000*(1-Math.exp(-supply/21));
+let converted=power*(1+bonus/100);
+let speed=100*Math.log(converted)+120;
 
-        if(speed>=2191){
-            high=supply;
-        }else{
-            low=supply;
-        }
+if(speed>=2191){
+high=supply;
+}else{
+low=supply;
+}
 
-    }
+}
 
-    document.getElementById("maxresult").innerHTML=
-    "必要物資: "+supply.toFixed(4)+" aa";
+document.getElementById("maxresult").innerHTML=
+"必要物資: "+supply.toFixed(4)+" aa";
+
+}
+
+
+// 상위 4명 전력 합계
+function sumPower(){
+
+let p1=parsePower(document.getElementById("p1").value);
+let p2=parsePower(document.getElementById("p2").value);
+let p3=parsePower(document.getElementById("p3").value);
+let p4=parsePower(document.getElementById("p4").value);
+
+let sum=p1+p2+p3+p4;
+
+document.getElementById("sumresult").innerHTML=
+"合計戦力: "+sum.toLocaleString()+" M";
+
+// 위 계산기에 자동 입력
+document.getElementById("power").value=sum.toFixed(3)+"M";
+document.getElementById("power2").value=sum.toFixed(3)+"M";
+
 }
 
 </script>
