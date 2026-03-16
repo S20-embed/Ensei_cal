@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>競争遠征計算機</title>
+<title>競争遠征計算機_260316_1500</title>
 
 <style>
 body{
@@ -46,7 +46,8 @@ margin-top:0;
 
 <div class="box">
 <h3>速度計算</h3>
-派遣戦力 (例: 242.4T / 560B / 48.3M)<br>
+
+派遣戦力 (例: 242.4M / 16.6B / 1.2T)<br>
 <input id="power"><br>
 
 物資 (aa)<br>
@@ -58,8 +59,9 @@ margin-top:0;
 </div>
 
 <div class="box">
-<h3>⚡ 最大速度(2191km/s)に必要な物資計算</h3>
-派遣戦力 (例: 242.4T / 560B)<br>
+<h3>⚡ 最大速度(2191km/s)に必要な物資</h3>
+
+派遣戦力 (例: 242.4M / 16.6B / 1.2T)<br>
 <input id="power2"><br><br>
 
 <button onclick="maxcalc()">必要物資を計算</button>
@@ -69,21 +71,24 @@ margin-top:0;
 
 <script>
 
-// 単位自動変換
+// 단위 변환
 function parsePower(input){
+
     input=input.trim().toLowerCase();
+
     let num=parseFloat(input);
-    if(input.includes("bb")) return num*1e15;
-    if(input.includes("aa")) return num*1e12;
-    if(input.includes("t")) return num*1e9;
-    if(input.includes("b")) return num*1e6;
+
+    if(input.includes("t")) return num*1000000;
+    if(input.includes("b")) return num*1000;
     if(input.includes("m")) return num;
-    if(input.includes("k")) return num/1000;
+
     return num;
 }
 
-// 速度計算
+
+// 속도 계산
 function calc(){
+
     let power=parsePower(document.getElementById("power").value);
     let supply=parseFloat(document.getElementById("supply").value);
 
@@ -92,9 +97,15 @@ function calc(){
         return;
     }
 
+    // 물자가산
     let bonus=100000000*(1-Math.exp(-supply/21));
+
+    // 환산전력 (M)
     let converted=power*(1+bonus/100);
+
+    // 속도 계산
     let speed=100*Math.log(converted)+120;
+
     if(speed>2191){speed=2191;}
 
     document.getElementById("result").innerHTML=
@@ -103,8 +114,10 @@ function calc(){
     "速度: "+speed.toFixed(0)+" km/s";
 }
 
-// MAX速度 必要物資計算
+
+// 최대속도 필요 물자 계산
 function maxcalc(){
+
     let power=parsePower(document.getElementById("power2").value);
 
     if(isNaN(power)){
@@ -112,31 +125,39 @@ function maxcalc(){
         return;
     }
 
-    let requiredConverted=Math.exp((2191-120)/100); // MAX速度基準の換算戦力
+    // 100aa 넣었을 때 속도 확인
+    let bonusMax = 100000000*(1-Math.exp(-100/21));
+    let convertedMax = power*(1+bonusMax/100);
+    let speedMax = 100*Math.log(convertedMax)+120;
 
-    // 現在の戦力だけで到達可能か
-    if(power >= requiredConverted){
+    if(speedMax < 2191){
         document.getElementById("maxresult").innerHTML =
-        "この戦力だけで最大速度に到達しています (必要物資: 0.0000 aa)";
+        "⚠ この戦力では最大速度に到達できません (100aaでも不足)";
         return;
     }
 
-    // 必要加算値
-    let neededBonus = 100*((requiredConverted/power)-1);
+    let low=0;
+    let high=100;
+    let supply=0;
 
-    // 必要加算値が1億%超える場合は不可能
-    if(neededBonus >= 100000000){
-        document.getElementById("maxresult").innerHTML=
-        "⚠ この戦力では最大速度に到達できません";
-        return;
+    for(let i=0;i<100;i++){
+
+        supply=(low+high)/2;
+
+        let bonus=100000000*(1-Math.exp(-supply/21));
+        let converted=power*(1+bonus/100);
+        let speed=100*Math.log(converted)+120;
+
+        if(speed>=2191){
+            high=supply;
+        }else{
+            low=supply;
+        }
+
     }
-
-    // 必要物資逆算
-    let supply = -21*Math.log(1-(neededBonus/100000000));
 
     document.getElementById("maxresult").innerHTML=
-    "必要加算％: "+neededBonus.toFixed(0)+" %<br>"+
-    "必要物資: "+supply.toFixed(4)+" aa"; // 소수점 4자리 표시
+    "必要物資: "+supply.toFixed(4)+" aa";
 }
 
 </script>
